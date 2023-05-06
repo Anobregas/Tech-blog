@@ -1,0 +1,16 @@
+<div class="text-center">
+  <h2>{{name}}</h2>
+  <p>{{description}}</p>
+  <p>Created by {{user.name}} on {{format_date date_created}}</p>
+  <p>
+  <div class="form-group">
+    <label for="exampleFormControlTextarea1"></label>
+    <textarea class="form-control" id="exampleFormControlTextarea1" placeholder="comments" rows="3"></textarea>
+  </div>
+  <button class="btn btn-primary">Leave comment</button>
+  </p>
+</div>
+<section>
+  <h1>Comments</h1>
+  <ul>{{comments}}</ul>
+</section>
