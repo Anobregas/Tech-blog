@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Project, User } = require('../models');
+const { Project, User, Comment } = require('../models');
 const withAuth = require('../utils/auth');
 
 router.get('/', async (req, res) => {
@@ -11,6 +11,7 @@ router.get('/', async (req, res) => {
           model: User,
           attributes: ['name'],
         },
+       {model: Comment}
       ],
     });
 
@@ -35,11 +36,13 @@ router.get('/project/:id', async (req, res) => {
           model: User,
           attributes: ['name'],
         },
+        {model:Comment}
       ],
     });
 
     const project = projectData.get({ plain: true });
-
+    
+    console.log("Get Project and comment", project)
     res.render('project', {
       ...project,
       logged_in: req.session.logged_in
@@ -48,6 +51,56 @@ router.get('/project/:id', async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+router.get('/', async (req, res) => {
+  try {
+    // Get all comments and JOIN with user data
+    const commentData = await Comment.findAll({
+      include: [
+        {
+          model: User,
+          attributes: ['name'],
+        },
+      ],
+    });
+
+    // Serialize data so the template can read it
+    const Comments = CommentData.map((comment) => comment.get({ plain: true }));
+
+    // Pass serialized data and session flag into template
+    res.render('project', { 
+      Comments, 
+      logged_in: req.session.logged_in 
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+
+router.get('/project/comment/:id', async (req, res) => {
+  console.log("Comment",req.params.id)
+  try {
+    const commentData = await Comment.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          attributes: ['name'],
+        },
+        Project
+      ],
+    });
+
+    const comment = commentData.get({ plain: true });
+    res.render('project', {
+      ...comment,
+      logged_in: req.session.logged_in
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 
 // Use withAuth middleware to prevent access to route
 router.get('/profile', withAuth, async (req, res) => {
