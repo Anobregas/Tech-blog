@@ -1,11 +1,11 @@
 const router = require('express').Router();
-const { Project, User, Comment } = require('../models');
+const { Blog, User, Comment } = require('../models');
 const withAuth = require('../utils/auth');
 
 router.get('/', async (req, res) => {
   try {
-    // Get all projects and JOIN with user data
-    const projectData = await Project.findAll({
+    // Get all Blogs and JOIN with user data
+    const blogData = await Blog.findAll({
       include: [
         {
           model: User,
@@ -16,11 +16,11 @@ router.get('/', async (req, res) => {
     });
 
     // Serialize data so the template can read it
-    const projects = projectData.map((project) => project.get({ plain: true }));
+    const blogs = blogData.map((blog) => blog.get({ plain: true }));
 
     // Pass serialized data and session flag into template
     res.render('homepage', { 
-      projects, 
+      blogs, 
       logged_in: req.session.logged_in 
     });
   } catch (err) {
@@ -28,9 +28,9 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/project/:id', async (req, res) => {
+router.get('/blog/:id', async (req, res) => {
   try {
-    const projectData = await Project.findByPk(req.params.id, {
+    const blogData = await Blog.findByPk(req.params.id, {
       include: [
         {
           model: User,
@@ -40,11 +40,11 @@ router.get('/project/:id', async (req, res) => {
       ],
     });
 
-    const project = projectData.get({ plain: true });
+    const blog = blogData.get({ plain: true });
     
-    console.log("Get Project and comment", project)
-    res.render('project', {
-      ...project,
+    console.log("Get Blog and comment", blog)
+    res.render('blog', {
+      ...blog,
       logged_in: req.session.logged_in
     });
   } catch (err) {
@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
     const Comments = CommentData.map((comment) => comment.get({ plain: true }));
 
     // Pass serialized data and session flag into template
-    res.render('project', { 
+    res.render('blog', { 
       Comments, 
       logged_in: req.session.logged_in 
     });
@@ -78,7 +78,7 @@ router.get('/', async (req, res) => {
 });
 
 
-router.get('/project/comment/:id', async (req, res) => {
+router.get('/blog/comment/:id', async (req, res) => {
   console.log("Comment",req.params.id)
   try {
     const commentData = await Comment.findByPk(req.params.id, {
@@ -87,12 +87,12 @@ router.get('/project/comment/:id', async (req, res) => {
           model: User,
           attributes: ['name'],
         },
-        Project
+        Blog
       ],
     });
 
     const comment = commentData.get({ plain: true });
-    res.render('project', {
+    res.render('blog', {
       ...comment,
       logged_in: req.session.logged_in
     });
@@ -108,7 +108,7 @@ router.get('/profile', withAuth, async (req, res) => {
     // Find the logged in user based on the session ID
     const userData = await User.findByPk(req.session.user_id, {
       attributes: { exclude: ['password'] },
-      include: [{ model: Project }],
+      include: [{ model: Blog }],
     });
 
     const user = userData.get({ plain: true });
