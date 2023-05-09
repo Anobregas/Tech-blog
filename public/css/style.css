@@ -1,5 +1,8 @@
+ * {font-family: 'Aboreto', cursive;}
+
 header, .blog:not(:last-child):not(:last-child) {
   border-bottom: 1px solid #ccc;
+  background-color: #ccf5ff
 }
 
 .no-button {
